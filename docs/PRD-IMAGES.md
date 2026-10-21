@@ -1,14 +1,14 @@
 # Image Integration PRD
 
 ## Overview
-Integrate visual assets for D&D content including spells, items, weapons, and characters. Use a combination of AI-generated images and free RPG assets to create a rich visual experience.
+Integrate visual assets for 5E content including spells, items, weapons, and characters. Use a combination of AI-generated images and free RPG assets to create a rich visual experience.
 
 ## Requirements
 
 ### Core Features
 1. **Image Generation**
    - AI image generation for unique content
-   - Style consistency with D&D theme
+   - Style consistency with 5E theme
    - Caching and optimization
    - Fallback system for failed generations
 
@@ -30,7 +30,7 @@ Integrate visual assets for D&D content including spells, items, weapons, and ch
 
 1. **AI Generation (Primary)**
    - Service: Replicate API with Stable Diffusion
-   - Style: Fantasy art with D&D aesthetic
+   - Style: Fantasy art with 5E aesthetic
    - Resolution: 512x512 for items, 1024x1024 for scenes
    - Cache Duration: 30 days
    - Prompt Engineering:

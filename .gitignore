@@ -29,3 +29,5 @@ logs
 *.db-shm
 *.db-wal
 .env
+
+*.db

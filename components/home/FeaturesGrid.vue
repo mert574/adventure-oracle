@@ -1,21 +1,21 @@
 <template>
   <div class="grid md:grid-cols-3 gap-8">
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-      <h3 class="text-xl font-bold text-red-500 mb-3">AI Dungeon Master</h3>
+      <h3 class="text-xl font-bold text-red-500 mb-3">Campaigns</h3>
       <p class="text-gray-300">
-        Dynamic storytelling powered by advanced AI that adapts to your choices.
+        Create campaigns and invite players to your party.
       </p>
     </div>
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-      <h3 class="text-xl font-bold text-red-500 mb-3">Real-time Multiplayer</h3>
+      <h3 class="text-xl font-bold text-red-500 mb-3">Characters</h3>
       <p class="text-gray-300">
-        Play together with friends in synchronized game campaigns.
+        Build characters with fifth-edition races, classes and backgrounds.
       </p>
     </div>
     <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-      <h3 class="text-xl font-bold text-red-500 mb-3">Visual Experience</h3>
+      <h3 class="text-xl font-bold text-red-500 mb-3">Rules Reference</h3>
       <p class="text-gray-300">
-        Immersive visuals with AI-generated imagery and 3D dice rolls.
+        Browse spells, equipment and other game data from Open5e.
       </p>
     </div>
   </div>

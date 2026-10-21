@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { join } from 'path';
+import { mkdirSync } from 'fs';
 
 let db: Database.Database | null = null;
 
@@ -7,6 +8,8 @@ export function getDatabase(): Database.Database {
     if (db) return db;
 
     try {
+        mkdirSync(join(process.cwd(), 'data'), { recursive: true });
+
         // Initialize database
         db = new Database(join(process.cwd(), 'data/game.db'), {
             // Verbose logging in development

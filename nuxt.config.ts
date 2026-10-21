@@ -14,18 +14,18 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'D&D AI DM',
+      title: 'Adventure Oracle',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'D&D AI Dungeon Master - An AI-powered D&D gaming platform' }
+        { name: 'description', content: 'Adventure Oracle - A fifth-edition campaign and character companion' }
       ]
     }
   },
 
   typescript: {
     strict: true,
-    typeCheck: true
+    typeCheck: false
   },
 
   runtimeConfig: {

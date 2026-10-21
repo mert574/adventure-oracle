@@ -1,5 +1,5 @@
 -- Up Migration
-CREATE TABLE schema_versions (
+CREATE TABLE IF NOT EXISTS schema_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     version TEXT NOT NULL,
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

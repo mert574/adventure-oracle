@@ -2,7 +2,7 @@
 
 /**
  * Script to initialize Open5e data store
- * This script fetches D&D data from the Open5e API and stores it locally
+ * This script fetches 5E data from the Open5e API and stores it locally
  */
 
 import { initializeOpen5eData } from '../server/utils/open5e/data-loader';

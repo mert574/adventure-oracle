@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="bg-gray-800 border-b border-red-900">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <NuxtLink to="/" class="text-2xl font-bold text-red-500">D&D AI DM</NuxtLink>
+        <NuxtLink to="/" class="text-2xl font-bold text-red-500">Adventure Oracle</NuxtLink>
 
         <div class="flex items-center gap-4">
           <template v-if="auth.isAuthenticated">
@@ -42,7 +42,8 @@
     <!-- Footer -->
     <footer class="bg-gray-800 border-t border-red-900 mt-auto">
       <div class="container mx-auto px-4 py-4 text-center text-sm text-gray-400">
-        <p>&copy; 2024 D&D AI DM</p>
+        <p>&copy; 2024 Adventure Oracle</p>
+        <a href="/licenses/" class="underline">Game data licenses and credits</a>
       </div>
     </footer>
   </div>

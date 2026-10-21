@@ -1,16 +1,16 @@
 {
-  "name": "dnd-ai-dm",
+  "name": "adventure-oracle",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "npm run typecheck && nuxt build",
     "dev": "nuxt dev",
     "start": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "db:migrate": "tsx server/db/migrate.ts && npx @better-auth/cli@latest migrate --config server/utils/better-auth.ts",
-    "db:migrate:up": "tsx server/db/migrate.ts up && npx @better-auth/cli@latest migrate --config server/utils/better-auth.ts",
+    "db:migrate": "tsx --env-file=.env server/db/migrate.ts && npx @better-auth/cli@1.2.12 migrate --y --config server/utils/better-auth.ts",
+    "db:migrate:up": "tsx --env-file=.env server/db/migrate.ts up && npx @better-auth/cli@1.2.12 migrate --y --config server/utils/better-auth.ts",
     "db:migrate:down": "tsx server/db/migrate.ts down",
     "db:migrate:down:all": "tsx server/db/migrate.ts down:all",
     "open5e:init": "tsx scripts/init-open5e.ts",
@@ -51,5 +51,9 @@
     "typescript-eslint": "^8.37.0",
     "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^3.0.3"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18.0 <23"
   }
 }

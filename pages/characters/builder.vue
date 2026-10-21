@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-100 mb-2">Character Builder</h1>
-        <p class="text-gray-400">Create your D&D character</p>
+        <p class="text-gray-400">Create your 5E character</p>
       </div>
 
       <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">

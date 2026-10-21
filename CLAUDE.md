@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a D&D AI Dungeon Master application built with:
+This is a Adventure Oracle application built with:
 - **Frontend**: Nuxt 4 (Vue 3) with TypeScript, Tailwind CSS
 - **Backend**: Nitro server with SQLite database
 - **State Management**: Pinia with persistence
 - **Authentication**: better-auth with database sessions (simplified from previous JWT system)
-- **External API**: Open5e integration for D&D data
+- **External API**: Open5e integration for 5E data
 
 ## Essential Commands
 
@@ -45,7 +45,7 @@ npm run generate   # Generate static site
 ### API Structure
 All API endpoints follow a standardized response format and are located in `server/api/`:
 - **Auth endpoints**: `/api/auth/[...auth]` - All authentication handled by better-auth
-- **Data endpoints**: `/api/data/*` - D&D game data and session management
+- **Data endpoints**: `/api/data/*` - 5E game data and session management
 
 ### Authentication Flow
 - Database sessions
@@ -55,7 +55,7 @@ All API endpoints follow a standardized response format and are located in `serv
 
 ### Database Layer
 - SQLite with prepared statements in `server/db/`
-- **App migrations**: `server/db/migrations/001_initial.sql` (D&D game tables: sessions, characters, messages)
+- **App migrations**: `server/db/migrations/001_initial.sql` (5E game tables: sessions, characters, messages)
 - **Auth tables**: `user`, `session`, `account`, `verification` (created via better-auth CLI)
 - **Database setup**: Use `npm run db:migrate` (runs both app + auth migrations)
 - Type-safe queries defined in `server/db/queries.ts` for app-specific data

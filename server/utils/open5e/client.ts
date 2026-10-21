@@ -24,6 +24,8 @@ const DEFAULT_CONFIG: Required<Open5eClientConfig> = {
   }
 };
 
+const documentedSources = new Set(['a5e', 'wotc-srd']);
+
 export class Open5eClient {
   private config: Required<Open5eClientConfig>;
   private rateLimitState: RateLimitState;
@@ -54,13 +56,18 @@ export class Open5eClient {
   ): Promise<T[]> {
     let url = `/${endpoint}`;
     const results: T[] = [];
-    
+
     const queryParams = { ...params, limit: '1500' };
 
     try {
       while (url) {
         const response = await this.get<Open5eApiResponse<T>>(url, queryParams);
-        results.push(...response.results);
+        results.push(...response.results.filter(item => {
+          if (typeof item !== 'object' || item === null || !('document__slug' in item)) {
+            return false;
+          }
+          return typeof item.document__slug === 'string' && documentedSources.has(item.document__slug);
+        }));
         url = response.next ?? '';
       }
 
@@ -123,7 +130,7 @@ export class Open5eClient {
           this.config.retryConfig.initialDelayMs * Math.pow(2, attempt - 1),
           this.config.retryConfig.maxDelayMs
         );
-        
+
         await new Promise(resolve => setTimeout(resolve, delay));
         return this.withRetry(fn, attempt + 1);
       }
@@ -177,7 +184,7 @@ export class Open5eClient {
       // Wait for the current window to expire
       const waitTime = this.config.rateLimit.windowMs - windowElapsed;
       await new Promise(resolve => setTimeout(resolve, waitTime));
-      
+
       // Reset window
       this.rateLimitState = {
         requests: 0,
@@ -193,7 +200,7 @@ export class Open5eClient {
 
     let statusCode: number | undefined;
     let message = 'Unknown error';
-    
+
     if (error && typeof error === 'object') {
       const e = error as { response?: { status?: number; data?: { detail?: string } }; message?: string };
       statusCode = e.response?.status;
@@ -208,7 +215,7 @@ export class Open5eClient {
         data: e.response?.data
       };
     }
-    
+
     return new Open5eError(message, statusCode, endpoint, context);
   }
-} 
+}

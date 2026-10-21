@@ -153,6 +153,6 @@ export default defineEventHandler(async (event: H3Event) => {
       throw error;
     }
     
-    throw apiErrorCreators.internal('Failed to fetch D&D data');
+    throw apiErrorCreators.internal('Failed to fetch game data');
   }
 });

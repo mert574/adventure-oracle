@@ -1,7 +1,7 @@
-# D&D AI DM Design System
+# Adventure Oracle Design System
 
 ## Theme
-Our design system is inspired by the dark, mysterious world of Dungeons & Dragons, emphasizing readability and immersion.
+Our design system is inspired by the dark, mysterious world of fifth-edition fantasy role-playing, emphasizing readability and immersion.
 
 ### Color Palette
 
@@ -59,7 +59,7 @@ Our design system is inspired by the dark, mysterious world of Dungeons & Dragon
 ### Layout Structure
 - **Header**
   - Fixed position for consistent navigation
-  - Prominent branding with the D&D AI DM logo
+  - Prominent branding with the Adventure Oracle logo
   - Clean and minimal to focus on content
 
 - **Main Content Area**

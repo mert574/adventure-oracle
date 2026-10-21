@@ -13,7 +13,7 @@ import type {
 import { Endpoint } from './types';
 
 /**
- * Initialize Open5e data store with D&D data
+ * Initialize Open5e data store with 5E data
  * This runs only once when the database is empty
  */
 export async function initializeOpen5eData() {
