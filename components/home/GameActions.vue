@@ -4,12 +4,13 @@
       <CharacterList :characters="characters" :loading="charactersLoading || initialLoading" @select="selectedCharacter = $event" @delete-character="handleDeleteCharacter" />
       <NuxtLink to="/characters/builder" class="button button-primary rail-action">Create character <span aria-hidden="true">+</span></NuxtLink>
     </aside>
-    <div class="world-stage"><DungeonScene :character-name="selectedCharacter?.name" :investigation-bonus="investigationBonus" /><div class="world-caption"><span class="live-ember" /> The Forgotten Depths <span class="muted">/ Solo exploration preview</span></div></div>
-    <aside class="campaign-rail">
-      <CampaignList :campaigns="campaigns" :loading="loading || initialLoading" />
-      <div class="rail-actions"><button class="button button-primary" :disabled="loading" @click="createModal.open()">Create campaign</button><button class="button button-secondary" :disabled="loading" @click="joinModal.open()">Join campaign</button></div>
-    </aside>
-    <div class="lobby-actionbar"><span class="eyebrow">Actions</span><NuxtLink to="/characters/builder" class="hotkey-action"><span class="hotkey-symbol">⚔</span><span>Create character</span></NuxtLink><button class="hotkey-action" :disabled="loading" @click="createModal.open()"><span class="hotkey-symbol">⚑</span><span>New campaign</span></button><button class="hotkey-action" :disabled="loading" @click="joinModal.open()"><span class="hotkey-symbol">♜</span><span>Join party</span></button><button class="hotkey-action" @click="emit('toggleCodex')"><span class="hotkey-symbol">▤</span><span>Codex [I]</span></button></div>
+    <div class="world-stage"><DungeonScene hide-location-hud :character-name="selectedCharacter?.name" :investigation-bonus="investigationBonus" /><div class="world-caption"><span class="live-ember" /> The Forgotten Depths <span class="muted">/ Solo exploration preview</span></div></div>
+    <CampaignSelector :campaigns="campaigns" :loading="loading || initialLoading" @select="campaignStore.setCurrentCampaign($event)" />
+    <div class="campaign-actions" role="group" aria-label="Campaign actions">
+      <button class="button button-primary" :disabled="loading || initialLoading" @click="createModal.open()">Create campaign</button>
+      <button class="button button-secondary" :disabled="loading || initialLoading" @click="joinModal.open()">Join campaign</button>
+    </div>
+    <div class="lobby-actionbar"><span class="eyebrow">Actions</span><NuxtLink to="/characters/builder" class="hotkey-action"><span class="hotkey-symbol">⚔</span><span>Create character</span></NuxtLink><button class="hotkey-action" @click="emit('toggleCodex')"><span class="hotkey-symbol">▤</span><span>Codex [I]</span></button></div>
     <p v-if="error || charactersError" class="error-note lobby-error" role="alert">{{ error || charactersError }}</p>
     <CreateCampaignModal :is-open="createModal.isOpen.value" :loading="loading" @create="handleCreateCampaign" @cancel="createModal.close()" />
     <JoinCampaignModal :is-open="joinModal.isOpen.value" :loading="loading" :characters="characters" @join="handleJoinCampaign" @cancel="joinModal.close()" />
@@ -20,13 +21,14 @@
 import type { DeepReadonly } from 'vue';
 import type { Character } from '~/server/db/types';
 import DungeonScene from '~/components/home/DungeonScene.vue';
-import CampaignList from '~/components/home/CampaignList.vue';
+import CampaignSelector from '~/components/home/CampaignSelector.vue';
 import CharacterList from '~/components/home/CharacterList.vue';
 import CreateCampaignModal from '~/components/home/CreateCampaignModal.vue';
 import JoinCampaignModal from '~/components/home/JoinCampaignModal.vue';
 
 const emit = defineEmits<{ toggleCodex: [] }>();
 const initialLoading = ref(true);
+const campaignStore = useCampaignStore();
 const selectedCharacter = ref<DeepReadonly<Character> | null>(null);
 const investigationBonus = computed(() => {
   const character = selectedCharacter.value;

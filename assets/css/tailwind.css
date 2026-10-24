@@ -623,3 +623,55 @@
 
 .dialog.dialog-codex { width: min(1280px, calc(100vw - 64px)); }
 @media (max-width: 760px) { .dialog.dialog-codex { width: calc(100vw - 20px); } }
+
+@layer components {
+  .campaign-switcher { position: absolute; z-index: 3; top: 25px; left: 50%; transform: translateX(-50%); width: min(850px, calc(100% - 760px)); min-height: 155px; text-align: center; }
+  .campaign-title { display: inline-block; max-width: 100%; padding: 10px 26px; border-top: 1px solid #c3a05a70; border-bottom: 1px solid #c3a05a70; color: #e0c28a; font: 1.7rem Georgia,serif; letter-spacing: .04em; text-shadow: 0 2px 6px #000; overflow-wrap: anywhere; }
+  .campaign-tabs { display: flex; gap: 22px; align-items: center; width: fit-content; max-width: 100%; margin: 20px auto 0; padding: 12px 18px; border: 1px solid #68532f; background: #15130dc0; overflow-x: auto; scrollbar-color: #79613b #17130e; }
+  .campaign-tabs button { display: flex; align-items: center; gap: 10px; flex-shrink: 0; color: #bca77e; font-size: .85rem; text-shadow: 0 1px 3px #000; white-space: nowrap; }
+  .campaign-tabs button.selected { color: #f6d38b; }
+  .campaign-tab-number { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #7e6742; background: #18140ee6; color: #aa8c54; font-family: Georgia,serif; }
+  .selected .campaign-tab-number { border-color: #e5bd69; box-shadow: 0 0 12px #dcac3d40; color: #f2ce84; }
+  .campaign-switcher-tools { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 17px; margin-top: 12px; font-size: .66rem; color: #ab9872; text-shadow: 0 1px 3px #000; }
+  .campaign-switcher-tools button { color: #cdb17a; }
+  .campaign-switcher-tools button:hover { color: #f2d398; }
+  .campaign-invitation > span { font-family: monospace; margin-left: 5px; }
+  .campaign-no-selection { margin-top: 16px; font-size: .75rem; color: #b5a481; text-shadow: 0 1px 3px #000; }
+  .campaign-title-skeleton { width: 250px; height: 45px; margin: 0 auto; }
+  .campaign-tab-skeleton { display: block; width: 110px; height: 30px; flex-shrink: 0; }
+}
+@media (min-width: 761px) and (max-width: 1199px) {
+  .campaign-switcher { width: calc(100% - 460px); }
+  .campaign-title { font-size: 1.2rem; }
+  .campaign-tabs { gap: 14px; padding: 10px 14px; }
+  .campaign-tabs button { font-size: .7rem; }
+}
+@media (max-width: 760px) {
+  .campaign-switcher { top: 85px; width: calc(100% - 36px); }
+  .campaign-title { font-size: 1.3rem; padding: 9px 18px; }
+  .campaign-tabs { margin-top: 14px; padding: 10px 12px; gap: 15px; }
+  .campaign-tabs button { font-size: .72rem; }
+  .campaign-tab-number { width: 27px; height: 27px; }
+  .campaign-switcher-tools { font-size: .6rem; gap: 12px; }
+}
+
+@layer components {
+  .campaign-actions { position: absolute; z-index: 4; top: 24px; right: 24px; display: grid; gap: 12px; width: 250px; }
+  .campaign-actions .button { min-height: 54px; padding: 15px 20px; font-size: .9rem; }
+  .campaign-action-skeleton { display: block; height: 54px; }
+}
+@media (min-width: 1200px) {
+  .campaign-actions { width: 300px; }
+  .campaign-actions .button { min-height: 60px; font-size: 1rem; }
+  .campaign-action-skeleton { height: 60px; }
+}
+@media (min-width: 761px) and (max-width: 1199px) {
+  .campaign-actions { right: 12px; width: 195px; }
+  .campaign-actions .button { font-size: .75rem; padding-inline: 12px; }
+}
+@media (max-width: 760px) {
+  .campaign-actions { top: 12px; right: 12px; width: 145px; gap: 7px; }
+  .campaign-actions .button { min-height: 36px; padding: 10px 8px; font-size: .62rem; }
+  .campaign-action-skeleton { height: 36px; }
+  .campaign-switcher { top: 120px; }
+}

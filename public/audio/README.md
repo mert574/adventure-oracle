@@ -16,7 +16,7 @@ license. The full license, including its warranty disclaimer, is bundled at
 from the game's credits control.
 
 Playback uses a local HTML audio element with looping enabled. Music starts on
-the first interaction or via the mute button, at a fixed volume of 10%.
+the first interaction or via the mute button, at a fixed volume of 5%.
 The mute preference is saved in browser storage. The player is mounted at the
 app root so page navigation does not restart playback. Starting or resuming tunes
 to `(Date.now() / 1000) % trackDuration`, giving the track a shared radio-style

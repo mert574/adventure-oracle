@@ -41,7 +41,7 @@ async function syncPlayback() {
   }
   failed.value = false;
   if (player.value.paused && player.value.readyState >= 1) syncRadioPosition();
-  player.value.volume = 0.1;
+  player.value.volume = 0.05;
   try {
     await player.value.play();
     removeGestureListeners();
@@ -75,7 +75,7 @@ onMounted(() => {
     if (typeof saved?.enabled === 'boolean') muted.value = !saved.enabled;
   } catch { /* Ignore invalid or unavailable stored preferences. */ }
   mounted = true;
-  if (player.value) player.value.volume = 0.1;
+  if (player.value) player.value.volume = 0.05;
   addGestureListeners();
   if (command.value > 0) void syncPlayback();
 });

@@ -7,8 +7,8 @@
     <div class="torch-glow torch-glow-right" aria-hidden="true" />
     <div class="portal-glow" aria-hidden="true" />
     <div class="embers" aria-hidden="true"><span v-for="ember in 14" :key="ember" :style="{ '--i': ember }" /></div>
-    <div class="dungeon-topbar"><span class="location-tag">Forgotten Depths</span><span class="preview-tag">Solo preview</span></div>
-    <div class="location-selector" role="group" aria-label="Explore dungeon locations"><button v-for="(room, index) in locations" :key="room.name" :class="{ selected: selectedLocation === index }" :aria-pressed="selectedLocation === index" :disabled="rolling" @click="selectLocation(index)"><span class="map-node" aria-hidden="true">{{ index + 1 }}</span>{{ room.name }}</button></div>
+    <div v-if="!hideLocationHud" class="dungeon-topbar"><span class="location-tag">Forgotten Depths</span><span class="preview-tag">Solo preview</span></div>
+    <div v-if="!hideLocationHud" class="location-selector" role="group" aria-label="Explore dungeon locations"><button v-for="(room, index) in locations" :key="room.name" :class="{ selected: selectedLocation === index }" :aria-pressed="selectedLocation === index" :disabled="rolling" @click="selectLocation(index)"><span class="map-node" aria-hidden="true">{{ index + 1 }}</span>{{ room.name }}</button></div>
     <div class="dungeon-bottom">
       <div class="dungeon-content"><p class="eyebrow">Location {{ selectedLocation + 1 }} / {{ locations.length }}</p><h2 id="dungeon-title">{{ location.name }}</h2><p class="location-description">{{ location.description }}</p><p class="check-label">{{ characterName ? `${characterName} · ` : '' }}Investigation {{ investigationBonus >= 0 ? '+' : '' }}{{ investigationBonus }} · DC {{ location.dc }}</p></div>
       <div class="dice-station"><button class="d20-button" :class="{ rolling }" :disabled="rolling" :aria-label="`Roll a twenty-sided die to search ${location.name}`" @click="roll"><svg viewBox="0 0 100 110" aria-hidden="true"><path d="m50 3 44 25v54l-44 25L6 82V28L50 3Z" /><path d="m50 3 25 42 19-17M6 28l19 17L50 3M25 45h50l-25 43-25-43ZM6 82l19-37M94 82 75 45M6 82l44 6 44-6M50 88v19" /></svg><span>{{ rolling ? '·' : result ?? '20' }}</span></button><button class="search-button" :disabled="rolling" @click="roll">{{ rolling ? 'Rolling…' : 'Search area' }}</button></div>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-const props = withDefaults(defineProps<{ characterName?: string; investigationBonus?: number }>(), { characterName: '', investigationBonus: 0 });
+const props = withDefaults(defineProps<{ characterName?: string; investigationBonus?: number; hideLocationHud?: boolean }>(), { characterName: '', investigationBonus: 0 });
 const sceneReady = ref(false);
 const locations = [
   { name: 'The entrance', position: '48% 50%', dc: 10, description: 'Someone has been here recently. There are fresh tracks in the dust beside the stairs.', success: 'The tracks lead behind a loose stone. You find a rusted key.', failure: 'The tracks disappear under fallen stone. You find nothing else.' },
