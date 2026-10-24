@@ -2,6 +2,9 @@
 
 ## Campaign play
 
+See the [reviewed solo-adventure plan](docs/SOLO-ADVENTURE-PLAN.md) for the proposed
+state model, AI turn pipeline, recovery behavior, and first implementation scope.
+
 - Build a playable campaign view with a persistent adventure log and player actions.
 - Add API-powered game-master narration and story progression informed by campaign state.
 - Track characters, inventory, NPCs, locations and unresolved story threads across sessions.
