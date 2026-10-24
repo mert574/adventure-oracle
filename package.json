@@ -17,7 +17,10 @@
     "db:migrate:down": "tsx server/db/migrate.ts down",
     "db:migrate:down:all": "tsx server/db/migrate.ts down:all",
     "open5e:init": "tsx scripts/init-open5e.ts",
+    "open5e:seed": "node --import tsx scripts/seed-open5e.ts",
+    "open5e:update-snapshot": "node scripts/update-open5e-snapshot.mjs",
     "typecheck": "vue-tsc --noEmit",
+    "test:offline": "node --test tests/offline-setup.test.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

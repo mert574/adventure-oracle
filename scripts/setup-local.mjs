@@ -16,7 +16,7 @@ process.loadEnvFile('.env');
 mkdirSync('data', { recursive: true });
 
 // Use only installed packages; never download a CLI during local startup.
-for (const script of ['server/db/migrate.ts', 'server/db/migrate-auth.ts']) {
+for (const script of ['server/db/migrate.ts', 'server/db/migrate-auth.ts', 'scripts/seed-open5e.ts', 'scripts/seed-local-user.ts']) {
   const result = spawnSync(process.execPath, ['--import', 'tsx', script], {
     stdio: 'inherit',
     env: process.env,

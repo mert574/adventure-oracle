@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "upstreamRevision": "e69ac13b49dae6a9d84abf38fc674fe1db5b392b",
+  "upstream": "https://github.com/open5e/open5e-api/tree/e69ac13b49dae6a9d84abf38fc674fe1db5b392b/data/v1/wotc-srd",
+  "source": "wotc-srd",
+  "license": "CC-BY-4.0",
+  "author": "Mike Mearls, Jeremy Crawford, Chris Perkins, Rodney Thompson, Peter Lee, James Wyatt, Robert J. Schwalb, Bruce R. Cordell, Chris Sims, and Steve Townshend, based on original material by E. Gary Gygax and Dave Arneson.",
+  "copyright": "System Reference Document 5.1 Copyright 2016, Wizards of the Coast, Inc.; Authors Mike Mearls, Jeremy Crawford, Chris Perkins, Rodney Thompson, Peter Lee, James Wyatt, Robert J. Schwalb, Bruce R. Cordell, Chris Sims, and Steve Townshend, based on original material by E. Gary Gygax and Dave Arneson.",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/legalcode",
+  "licensingBasis": "SRD 5.1 is dual-licensed; this snapshot uses the Creative Commons option, replacing the legacy OGL metadata.",
+  "modifications": "Selected eight application categories, decoded JSON fields, joined SRD subraces and archetypes, derived spell components and levels, and omitted artwork. Upstream transcription and rule modifications are retained; this is not an authoritative verbatim SRD edition.",
+  "sha256": "687074bd8df01bf3be2de3f17304687cf9762e8e8c0c466f3e5af5ad9a4329f8",
+  "counts": {
+    "races": 9,
+    "classes": 12,
+    "backgrounds": 1,
+    "spells": 319,
+    "monsters": 322,
+    "weapons": 37,
+    "magic_items": 237,
+    "feats": 1
+  }
+}
