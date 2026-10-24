@@ -17,17 +17,17 @@ Use Node.js 22.18.0 (see `.nvmrc`).
 npm ci
 ```
 
-Copy `.env.example` to `.env`. Set `BETTER_AUTH_SECRET` to a randomly generated
-secret of at least 32 characters and `BETTER_AUTH_URL` to `http://localhost:3000`.
-Then initialize a fresh local database:
+Start the app:
 
 ```sh
-npm run db:migrate
-npm run open5e:init
 npm run dev
 ```
 
-Open5e initialization needs internet access. Imported data is cached locally. Only the CC BY 4.0 SRD 5.1 and A5E sources are imported.
+`npm run dev` and `npm start` automatically create `.env` with a random local auth secret and initialize the SQLite database. Existing configuration and data are preserved. No manual setup or internet connection is needed after dependencies are installed. You can also run this setup explicitly with `npm run setup:local`.
+
+Database migrations and local accounts run offline using the installed dependencies and SQLite; Better Auth does not require a hosted service. Optionally run `npm run open5e:init` online to populate the rules reference; it stays empty until data is imported.
+
+Dependency installation and Open5e initialization need internet access. Imported data is cached locally. Only the CC BY 4.0 SRD 5.1 and A5E sources are imported.
 Create your own test account through the app; no accounts or campaigns are bundled.
 Local databases and environment files are ignored by Git.
 
