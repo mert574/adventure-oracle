@@ -1,39 +1,20 @@
 <template>
-  <Modal :is-open="isOpen" title="Create New Campaign">
+  <Modal :is-open="isOpen" :busy="loading" title="Create a campaign" @close="handleCancel">
+    <p class="muted text-sm leading-relaxed mb-6">Enter a name. Your campaign will have a code you can share with other players.</p>
     <form @submit.prevent="handleSubmit">
-      <div class="mb-4">
-        <label class="block text-gray-300 text-sm font-medium mb-2">
-          Campaign Name
-        </label>
-        <input 
-          v-model="form.name"
-          type="text"
-          required
-          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500"
-          placeholder="Enter campaign name"
-        >
-      </div>
-      <div class="flex gap-3">
-        <button 
-          type="submit"
-          :disabled="loading || !form.name.trim()"
-          class="flex-1 bg-red-700 hover:bg-red-800 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors"
-        >
-          Create Campaign
-        </button>
-        <button 
-          type="button"
-          class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-medium transition-colors"
-          @click="handleCancel"
-        >
-          Cancel
-        </button>
+      <label for="campaign-name">Campaign name</label>
+      <input id="campaign-name" v-model="form.name" required maxlength="100" placeholder="e.g. The Ashen Frontier" autofocus :disabled="loading">
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" :disabled="loading" @click="handleCancel">Cancel</button>
+        <button type="submit" class="button button-primary" :disabled="loading || !form.name.trim()">{{ loading ? 'Creating…' : 'Create campaign' }} <span aria-hidden="true">↗</span></button>
       </div>
     </form>
   </Modal>
 </template>
 
 <script setup lang="ts">
+import Modal from '~/components/ui/Modal.vue';
+
 interface Props {
   isOpen: boolean;
   loading: boolean;

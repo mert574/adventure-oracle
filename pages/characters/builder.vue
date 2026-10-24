@@ -1,194 +1,47 @@
 <template>
-  <div class="min-h-screen bg-gray-900 py-8">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-100 mb-2">Character Builder</h1>
-        <p class="text-gray-400">Create your 5E character</p>
-      </div>
-
-      <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <!-- Step Progress -->
-        <div class="mb-8">
-          <div class="flex items-center justify-between">
-            <div
-v-for="(step, index) in steps" :key="step.id" 
-                 class="flex items-center"
-                 :class="{ 'flex-1': index < steps.length - 1 }">
-              <div class="flex items-center">
-                <div
-class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors"
-                     :class="getStepClasses(index)">
-                  <span class="text-sm font-medium">{{ index + 1 }}</span>
-                </div>
-                <span
-class="ml-3 text-sm font-medium"
-                      :class="currentStep >= index ? 'text-gray-100' : 'text-gray-500'">
-                  {{ step.title }}
-                </span>
-              </div>
-              <div
-v-if="index < steps.length - 1" 
-                   class="flex-1 h-0.5 mx-4 transition-colors"
-                   :class="currentStep > index ? 'bg-red-500' : 'bg-gray-600'"/>
-            </div>
-          </div>
-        </div>
-
-        <!-- Form Content -->
+  <NuxtLayout name="default">
+    <header class="builder-heading mt-8"><p class="eyebrow">Character creation</p><h1 class="display">Create your character.</h1><p class="muted text-sm leading-relaxed">Choose a class and enter your character’s starting statistics.</p></header>
+    <div class="builder-layout">
+      <aside class="character-creation-rail">
+        <div class="character-preview"><GameIcon name="shield" class="w-24 h-24" /><h2>{{ characterData.name || 'New character' }}</h2><p>{{ characterData.race || 'Choose a race' }} · {{ characterData.class || 'Choose a class' }}</p><span class="eyebrow">Level {{ characterData.level }}</span></div>
+        <ol class="builder-steps" aria-label="Character creation steps">
+          <li v-for="(step, index) in steps" :key="step.id" class="builder-step" :class="{ 'builder-step-current': currentStep === index }" :aria-current="currentStep === index ? 'step' : undefined"><span>{{ currentStep > index ? '✓' : `0${index + 1}` }}</span>{{ step.title }}</li>
+        </ol>
+        <p class="form-hint mt-5 hidden md:block">Fifth-edition character creation.</p>
+      </aside>
+      <section class="builder-sheet">
         <form @submit.prevent="handleSubmit">
-          <!-- Step 1: Basic Info -->
-          <div v-if="currentStep === 0" class="space-y-6">
-            <h2 class="text-xl font-semibold text-gray-100 mb-4">Basic Information</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Character Name</label>
-                <input
-v-model="characterData.name" 
-                       type="text" 
-                       required
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                       placeholder="Enter character name">
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Class</label>
-                <select
-v-model="characterData.class" 
-                        required
-                        class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500">
-                  <option value="">Select Class</option>
-                  <option v-for="cls in classes" :key="cls" :value="cls">{{ cls }}</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Race</label>
-                <select
-v-model="characterData.race" 
-                        required
-                        class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500">
-                  <option value="">Select Race</option>
-                  <option v-for="race in races" :key="race" :value="race">{{ race }}</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Level</label>
-                <input
-v-model.number="characterData.level" 
-                       type="number" 
-                       min="1" 
-                       max="20" 
-                       required
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500">
-              </div>
+          <div v-if="currentStep === 0">
+            <p class="eyebrow mb-3">Step 01 / Identity</p><h2>Character identity</h2><p class="form-hint">Choose your character’s name, class, and ancestry.</p>
+            <div class="form-grid">
+              <div class="col-span-2"><label for="character-name">Character name</label><input id="character-name" v-model="characterData.name" required placeholder="Enter character name" autocomplete="off"></div>
+              <div><label for="character-class">Class</label><select id="character-class" v-model="characterData.class" required><option value="" disabled>Choose a class</option><option v-for="cls in classes" :key="cls" :value="cls">{{ cls }}</option></select></div>
+              <div><label for="character-race">Race</label><select id="character-race" v-model="characterData.race" required><option value="" disabled>Choose a race</option><option v-for="race in races" :key="race" :value="race">{{ race }}</option></select></div>
+              <div><label for="character-level">Starting level</label><input id="character-level" v-model.number="characterData.level" type="number" min="1" max="20" required></div>
             </div>
           </div>
-
-          <!-- Step 2: Ability Scores -->
-          <div v-if="currentStep === 1" class="space-y-6">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-xl font-semibold text-gray-100">Ability Scores</h2>
-              <button
-type="button" 
-                      class="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg font-medium transition-colors"
-                      @click="rollAbilityScores">
-                Roll Scores
-              </button>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-              <div v-for="ability in abilities" :key="ability.key">
-                <label class="block text-sm font-medium text-gray-300 mb-2">{{ ability.name }}</label>
-                <input
-v-model.number="characterData[ability.key as keyof typeof characterData]" 
-                       type="number" 
-                       min="1" 
-                       max="30" 
-                       required
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500">
-              </div>
-            </div>
+          <div v-if="currentStep === 1">
+            <p class="eyebrow mb-3">Step 02 / Abilities</p><div class="row-between"><h2>Ability scores</h2><button type="button" class="button button-secondary" @click="rollAbilityScores">Roll scores ↻</button></div><p class="form-hint">Enter your table’s ability scores, or roll a set to get started.</p>
+            <div class="form-grid"><div v-for="ability in abilities" :key="ability.key"><label :for="`ability-${ability.key}`">{{ ability.name }}</label><input :id="`ability-${ability.key}`" v-model.number="characterData[ability.key as keyof typeof characterData]" type="number" min="1" max="30" required></div></div>
           </div>
-
-          <!-- Step 3: Combat Stats -->
-          <div v-if="currentStep === 2" class="space-y-6">
-            <h2 class="text-xl font-semibold text-gray-100 mb-4">Combat Statistics</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Max Hit Points</label>
-                <input
-v-model.number="characterData.maxHp" 
-                       type="number" 
-                       min="1" 
-                       required
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500">
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Armor Class</label>
-                <input
-v-model.number="characterData.armorClass" 
-                       type="number" 
-                       min="1" 
-                       required
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500">
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Hit Dice</label>
-                <input
-v-model="characterData.hitDice" 
-                       type="text" 
-                       required
-                       placeholder="e.g., 1d8"
-                       class="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-red-500 focus:border-red-500">
-              </div>
-            </div>
+          <div v-if="currentStep === 2">
+            <p class="eyebrow mb-3">Step 03 / Combat</p><h2>Combat statistics</h2><p class="form-hint">Set your starting combat statistics using your class and equipment.</p>
+            <div class="form-grid"><div><label for="max-hp">Maximum hit points</label><input id="max-hp" v-model.number="characterData.maxHp" type="number" min="1" required></div><div><label for="armor-class">Armor class</label><input id="armor-class" v-model.number="characterData.armorClass" type="number" min="1" required></div><div><label for="hit-dice">Hit dice</label><input id="hit-dice" v-model="characterData.hitDice" required placeholder="1d8"></div></div>
           </div>
-
-          <!-- Navigation Buttons -->
-          <div class="flex justify-between mt-8 pt-6 border-t border-gray-700">
-            <button
-v-if="currentStep > 0" 
-                    type="button"
-                    class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
-                    @click="previousStep">
-              Previous
-            </button>
-            <div v-else/>
-            
-            <button
-v-if="currentStep < steps.length - 1"
-                    type="button" 
-                    :disabled="!isCurrentStepValid"
-                    class="px-6 py-2 bg-red-700 hover:bg-red-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
-                    @click="nextStep">
-              Next
-            </button>
-            
-            <button
-v-else
-                    type="submit"
-                    :disabled="loading || !isFormValid"
-                    class="px-6 py-2 bg-red-700 hover:bg-red-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors">
-              {{ loading ? 'Creating...' : 'Create Character' }}
-            </button>
+          <p v-if="error" class="error-note mt-6" role="alert">{{ error }}</p>
+          <div class="dialog-actions justify-between">
+            <button v-if="currentStep > 0" type="button" class="button button-secondary" :disabled="loading" @click="previousStep">← Previous</button><span v-else class="eyebrow self-center">Step 1 of 3</span>
+            <button v-if="currentStep < steps.length - 1" type="button" class="button button-primary" :disabled="!isCurrentStepValid" @click="nextStep">Continue →</button>
+            <button v-else type="submit" class="button button-primary" :disabled="loading || !isFormValid">{{ loading ? 'Creating character…' : 'Create character' }} <span v-if="!loading" aria-hidden="true">↗</span></button>
           </div>
         </form>
-
-        <!-- Error Display -->
-        <div v-if="error" class="mt-4 p-4 bg-red-900 bg-opacity-50 border border-red-500 rounded-lg">
-          <p class="text-red-300">{{ error }}</p>
-        </div>
-      </div>
+      </section>
     </div>
-  </div>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
+import GameIcon from '~/components/ui/GameIcon.vue';
 const router = useRouter()
 
 const currentStep = ref(0)
@@ -235,16 +88,6 @@ const abilities = [
   { key: 'wisdom', name: 'Wisdom' },
   { key: 'charisma', name: 'Charisma' }
 ]
-
-function getStepClasses(index: number) {
-  if (currentStep.value > index) {
-    return 'bg-red-500 border-red-500 text-white'
-  } else if (currentStep.value === index) {
-    return 'bg-red-700 border-red-700 text-white'
-  } else {
-    return 'bg-gray-700 border-gray-600 text-gray-400'
-  }
-}
 
 function rollAbilityScores() {
   function rollStat() {

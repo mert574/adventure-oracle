@@ -1,143 +1,87 @@
-# Adventure Oracle Design System
+# Adventure Oracle interface
 
-## Theme
-Our design system is inspired by the dark, mysterious world of fifth-edition fantasy role-playing, emphasizing readability and immersion.
+## Direction
 
-### Color Palette
+Use an old-school MMORPG interface, with World of Warcraft Classic as the user's
+visual reference: dark stone/leather surfaces, aged metal frames, gold text,
+compact red controls, atmospheric dungeon art, and custom metal/gauntlet cursors.
+Use original assets; do not copy Blizzard art, logos, characters, or UI textures.
+Copy should be plain and specific. Avoid marketing slogans, balanced sentence
+fragments, and invented feature claims.
 
-#### Primary Colors
-- **Blood Red** (`text-red-500`)
-  - Used for headings and important text
-  - Represents dragon fire, magic, and adventure
-  - Provides strong contrast against dark backgrounds
+## Composition
 
-- **Deep Crimson** (`bg-red-700`, `hover:bg-red-800`)
-  - Primary action buttons
-  - Symbolizes power and importance
-  - Darkens on hover for interactive feedback
+The main screen is a full-screen dungeon viewport, not a website with a header,
+hero, cards, and footer. `layouts/game.vue` supplies the viewport and a small
+account HUD. Character and campaign panels float along the edges. The bottom
+action bar opens existing character/campaign flows and the codex overlay.
+The codex uses a wide native dialog with a searchable entry list and full rule
+details in a 1:2 split. It loads complete local spell, magic-item, and weapon
+categories on first open. Mobile uses list/detail navigation. I opens it outside
+text fields, and Escape closes it.
 
-#### Secondary Colors
-- **Stone Gray** (`bg-stone-600`, `hover:bg-stone-700`)
-  - Secondary action buttons
-  - Reminiscent of aged leather and parchment
-  - Provides visual hierarchy in actions
+The dungeon preview has three selectable locations and d20
+investigation checks with local outcomes. This is a standalone preview: it does
+not save campaign progress or claim to implement multiplayer campaign play.
+Existing server-side campaigns and characters remain separate from the preview.
 
-#### Background Colors
-- **Dungeon Dark** (`bg-gray-900`)
-  - Main background color
-  - Creates an immersive, dark atmosphere
-  - Reduces eye strain during long sessions
+Account pages use one centered game panel against a landscape, with a small
+back-to-camp control and no website header or footer. Character
+creation has a live character summary, creation steps, and a framed stat sheet.
+Shared dialogs use native `<dialog>` for focus trapping, Escape, and restoration.
+Backdrop clicks and close buttons dismiss dialogs unless a mutation is busy.
 
-- **Surface Dark** (`bg-gray-800`)
-  - Card and component backgrounds
-  - Slightly lighter than main background
-  - Creates subtle depth and layering
+## Assets and implementation
 
-#### Accent Colors
-- **Dark Crimson** (`border-red-900`)
-  - Border accents
-  - Subtle separation between sections
-  - Reinforces the fantasy theme
+`assets/css/tailwind.css` contains shared semantic classes and color variables.
+Use Georgia for headings and game captions, and local system sans-serif for
+body/forms. No remote fonts, image requests, or new runtime packages are needed.
+Original generated environment WebPs and exact prompts are documented in
+`public/images/README.md`. Game icons are SVG in `components/ui/GameIcon.vue`;
+custom cursors are in `public/cursors/` with native fallbacks. Fields retain
+text cursors and disabled controls retain appropriate feedback.
 
-#### Text Colors
-- **Primary Text** (`text-gray-100`)
-  - Main text color
-  - High contrast for readability
-  - Clean and crisp appearance
+Torch flicker, embers, portal light, panel entry, and dice rolls provide motion.
+Honor `prefers-reduced-motion` and keep ambient layers decorative. Resolve rolls
+immediately when reduced motion is requested.
 
-- **Secondary Text** (`text-gray-300`)
-  - Supporting text and descriptions
-  - Maintains readability while creating hierarchy
-  - Softer on the eyes for longer content
+## Responsive and accessibility checks
 
-- **Muted Text** (`text-gray-400`)
-  - Footer text and less important information
-  - Maintains accessibility while de-emphasizing content
+Use explicit labels, readable text contrast, keyboard focus, and useful
+empty/error/loading states. On mobile, show the dungeon first, move panels below,
+and retain a fixed action bar. Codex and modal content must stay within the
+viewport and scroll when needed. Test focus/Escape, account flows, character
+creation, codex categories, room selection, rolls, and browser errors.
+Use the user's running development server; do not start another without approval.
 
-## UI Components
+## Character selection and loading
 
-### Layout Structure
-- **Header**
-  - Fixed position for consistent navigation
-  - Prominent branding with the Adventure Oracle logo
-  - Clean and minimal to focus on content
+The character panel is a selector with a directly visible sheet: six abilities,
+HP meter, armor, speed, and hit dice. Switching characters updates the preview's
+investigation bonus; full details remain available in the sheet dialog.
+Reserve panel dimensions before data arrives. Use animated skeletons for session,
+roster, campaign, and codex loading; fade the background image in without changing
+geometry. Do not flash empty states before initial requests finish.
 
-- **Main Content Area**
-  - Flexible growth for various content lengths
-  - Consistent padding and spacing
-  - Container-based layout for readability
+On desktops of at least 1200px, the account HUD, side panels, and action bar are
+about 50% larger than the compact treatment. Preserve scrollable panel content.
+The removed circular minimap should not be reintroduced as a decorative control.
 
-- **Footer**
-  - Minimal design with essential information
-  - Stays at bottom regardless of content length
-  - Subtle separation from main content
+## Music
 
-### Cards and Sections
-- Consistent rounded corners (`rounded-lg`)
-- Subtle borders for depth
-- Generous padding for content breathing room
-- Clear visual hierarchy with headings
+A locally bundled recording of “Mystery Forest” by Alexandr Zhelanov (CC BY 3.0)
+loops after user interaction. Use licensed instrumental recordings rather than
+procedural oscillator music for the soundtrack.
+`components/ui/BackgroundMusic.vue` is mounted at the app root for uninterrupted
+playback across navigation. Keep the mute toggle accessible, remember
+preferences, and never require remote streaming. Track provenance and its
+license are documented in `public/audio/README.md`.
 
-### Buttons
-- **Primary Actions**
-  - Large touch targets (padding: 2rem horizontal, 1rem vertical)
-  - Clear hover states
-  - Bold, attention-grabbing red color
+The music player is global to `app.vue`, outside pages/layouts. Use
+`useBackgroundMusic()` to pause/resume or mute/unmute from any page or dialog.
+Page-level resume must respect the user's mute preference. Use Nuxt navigation
+for internal routes; the credits screen lives at `/credits`. Sign-out updates
+state without a document reload so playback remains continuous.
 
-- **Secondary Actions**
-  - Same size as primary for consistency
-  - Stone gray color to indicate secondary importance
-  - Matching hover states for consistency
-
-## UX Principles
-
-### Typography
-- **Headings**
-  - Large, bold text for clear hierarchy
-  - Red color for emphasis
-  - Consistent spacing below
-
-- **Body Text**
-  - Comfortable line height for readability
-  - Adequate contrast with background
-  - Appropriate font sizes for different contexts
-
-### Spacing
-- Consistent vertical rhythm (`space-y-8`)
-- Generous padding in containers
-- Grid gap matching vertical rhythm
-- Responsive margins and padding
-
-### Interactions
-- Smooth color transitions (200ms)
-- Clear hover states on interactive elements
-- Consistent button sizes and behaviors
-- Predictable layout on all screen sizes
-
-### Accessibility
-- High contrast text colors
-- Large touch targets
-- Clear visual hierarchy
-- Semantic HTML structure
-
-## Responsive Design
-- Mobile-first approach
-- Flexible grid system
-- Consistent spacing across breakpoints
-- Maintains readability at all sizes
-
-## Future Considerations
-- Animation system for transitions and effects
-- Loading states and skeletons
-- Error and success states
-- Toast notifications
-- Modal and dialog system
-- Form input styles
-- Interactive dice roll animations
-- Character sheet layouts
-- Combat interface design
-- Map and token visualization
-
----
-
-This design system is a living document and will evolve as we add more features and gather user feedback. 
+Music tunes to the current Unix timestamp modulo the track duration when it
+starts or resumes, providing radio-style playback without resetting on routes.

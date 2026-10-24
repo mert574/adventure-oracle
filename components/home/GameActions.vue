@@ -1,61 +1,41 @@
 <template>
-  <div class="space-y-8">
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-4">
-      <button 
-        :disabled="loading"
-        class="bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg font-medium transition-colors"
-        @click="createModal.open()"
-      >
-        Create New Campaign
-      </button>
-      <button 
-        :disabled="loading"
-        class="bg-stone-600 hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg font-medium transition-colors"
-        @click="joinModal.open()"
-      >
-        Join Campaign
-      </button>
-      <NuxtLink 
-        to="/characters/builder"
-        class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-medium transition-colors inline-block"
-      >
-        Create Character
-      </NuxtLink>
-    </div>
-
-    <!-- Error Display -->
-    <div v-if="error || charactersError" class="bg-red-900/50 border border-red-700 rounded-lg p-4">
-      <p v-if="error" class="text-red-300">{{ error }}</p>
-      <p v-if="charactersError" class="text-red-300">{{ charactersError }}</p>
-    </div>
-
-    <!-- Campaign and Character Lists -->
-    <CampaignList :campaigns="campaigns" :loading="loading" />
-    <CharacterList 
-      :characters="characters" 
-      :loading="charactersLoading" 
-      @delete-character="handleDeleteCharacter"
-    />
-
-    <!-- Modals -->
-    <CreateCampaignModal
-      :is-open="createModal.isOpen.value"
-      :loading="loading"
-      @create="handleCreateCampaign"
-      @cancel="createModal.close()"
-    />
-    <JoinCampaignModal
-      :is-open="joinModal.isOpen.value"
-      :loading="loading"
-      :characters="characters"
-      @join="handleJoinCampaign"
-      @cancel="joinModal.close()"
-    />
-  </div>
+  <section id="party" class="lobby-board" aria-label="Your party and characters">
+    <aside class="roster-rail">
+      <CharacterList :characters="characters" :loading="charactersLoading || initialLoading" @select="selectedCharacter = $event" @delete-character="handleDeleteCharacter" />
+      <NuxtLink to="/characters/builder" class="button button-primary rail-action">Create character <span aria-hidden="true">+</span></NuxtLink>
+    </aside>
+    <div class="world-stage"><DungeonScene :character-name="selectedCharacter?.name" :investigation-bonus="investigationBonus" /><div class="world-caption"><span class="live-ember" /> The Forgotten Depths <span class="muted">/ Solo exploration preview</span></div></div>
+    <aside class="campaign-rail">
+      <CampaignList :campaigns="campaigns" :loading="loading || initialLoading" />
+      <div class="rail-actions"><button class="button button-primary" :disabled="loading" @click="createModal.open()">Create campaign</button><button class="button button-secondary" :disabled="loading" @click="joinModal.open()">Join campaign</button></div>
+    </aside>
+    <div class="lobby-actionbar"><span class="eyebrow">Actions</span><NuxtLink to="/characters/builder" class="hotkey-action"><span class="hotkey-symbol">⚔</span><span>Create character</span></NuxtLink><button class="hotkey-action" :disabled="loading" @click="createModal.open()"><span class="hotkey-symbol">⚑</span><span>New campaign</span></button><button class="hotkey-action" :disabled="loading" @click="joinModal.open()"><span class="hotkey-symbol">♜</span><span>Join party</span></button><button class="hotkey-action" @click="emit('toggleCodex')"><span class="hotkey-symbol">▤</span><span>Codex [I]</span></button></div>
+    <p v-if="error || charactersError" class="error-note lobby-error" role="alert">{{ error || charactersError }}</p>
+    <CreateCampaignModal :is-open="createModal.isOpen.value" :loading="loading" @create="handleCreateCampaign" @cancel="createModal.close()" />
+    <JoinCampaignModal :is-open="joinModal.isOpen.value" :loading="loading" :characters="characters" @join="handleJoinCampaign" @cancel="joinModal.close()" />
+  </section>
 </template>
 
 <script setup lang="ts">
+import type { DeepReadonly } from 'vue';
+import type { Character } from '~/server/db/types';
+import DungeonScene from '~/components/home/DungeonScene.vue';
+import CampaignList from '~/components/home/CampaignList.vue';
+import CharacterList from '~/components/home/CharacterList.vue';
+import CreateCampaignModal from '~/components/home/CreateCampaignModal.vue';
+import JoinCampaignModal from '~/components/home/JoinCampaignModal.vue';
+
+const emit = defineEmits<{ toggleCodex: [] }>();
+const initialLoading = ref(true);
+const selectedCharacter = ref<DeepReadonly<Character> | null>(null);
+const investigationBonus = computed(() => {
+  const character = selectedCharacter.value;
+  if (!character) return 0;
+  const intelligence = Math.floor((character.intelligence - 10) / 2);
+  const skill = character.skillProficiencies?.find(entry => entry.name.toLowerCase() === 'investigation');
+  return intelligence + (skill?.proficient ? (character.proficiencyBonus || 0) * (skill.expertise ? 2 : 1) : 0);
+});
+
 const { createCampaign, joinCampaign, fetchUserCampaigns, campaigns, loading, error } = useCampaign();
 const { 
   fetchUserCharacters, 
@@ -88,8 +68,8 @@ async function handleDeleteCharacter(id: number) {
   }
 }
 
-onMounted(() => {
-  fetchUserCampaigns();
-  fetchUserCharacters();
+onMounted(async () => {
+  await Promise.all([fetchUserCampaigns(), fetchUserCharacters()]);
+  initialLoading.value = false;
 });
-</script> 
+</script>

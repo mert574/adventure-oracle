@@ -1,64 +1,30 @@
 <template>
-  <Modal :is-open="isOpen" title="Join Campaign">
+  <Modal :is-open="isOpen" :busy="loading" title="Join a campaign" @close="handleCancel">
+    <p class="muted text-sm leading-relaxed mb-6">Enter your invitation code and select a character.</p>
     <form @submit.prevent="handleSubmit">
-      <div class="mb-4">
-        <label class="block text-gray-300 text-sm font-medium mb-2">
-          Campaign Code
-        </label>
-        <input 
-          v-model="form.campaignCode"
-          type="text"
-          required
-          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500"
-          placeholder="Enter campaign code"
-        >
+      <div class="space-y-6">
+        <div><label for="campaign-code">Campaign code</label><input id="campaign-code" v-model="form.campaignCode" required placeholder="Enter your invitation code" autofocus :disabled="loading" autocapitalize="characters" spellcheck="false" class="font-mono tracking-widest"></div>
+        <div><label for="join-character">Your character</label><select id="join-character" v-model.number="form.characterId" required :disabled="loading || !characters?.length"><option :value="null" disabled>Choose a character</option><option v-for="character in characters" :key="character.id" :value="character.id">{{ character.name }} · Level {{ character.level }} {{ character.class }}</option></select>
+          <p v-if="!characters?.length" class="form-hint">You’ll need a character first. <NuxtLink to="/characters/builder" class="text-link">Create one →</NuxtLink></p>
+        </div>
       </div>
-      <div class="mb-4">
-        <label class="block text-gray-300 text-sm font-medium mb-2">
-          Character
-        </label>
-        <select
-          v-model.number="form.characterId"
-          required
-          :disabled="!characters?.length"
-          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <option value="">Select a character</option>
-          <option v-for="character in characters" :key="character.id" :value="character.id">
-            {{ character.name }} (Level {{ character.level }} {{ character.race }} {{ character.class }})
-          </option>
-        </select>
-        <p v-if="!characters?.length" class="text-sm text-gray-400 mt-1">
-          No characters available. Create a character first.
-        </p>
-      </div>
-      <div class="flex gap-3">
-        <button 
-          type="submit"
-          :disabled="loading || !form.campaignCode.trim() || !form.characterId || !characters?.length"
-          class="flex-1 bg-stone-600 hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 rounded-lg font-medium transition-colors"
-        >
-          Join Campaign
-        </button>
-        <button 
-          type="button"
-          class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-medium transition-colors"
-          @click="handleCancel"
-        >
-          Cancel
-        </button>
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" :disabled="loading" @click="handleCancel">Cancel</button>
+        <button type="submit" class="button button-primary" :disabled="loading || !form.campaignCode.trim() || !form.characterId || !characters?.length">{{ loading ? 'Joining…' : 'Join campaign' }} <span aria-hidden="true">↗</span></button>
       </div>
     </form>
   </Modal>
 </template>
 
 <script setup lang="ts">
+import type { DeepReadonly } from 'vue';
+import Modal from '~/components/ui/Modal.vue';
 import type { Character } from '~/server/db/types';
 
 interface Props {
   isOpen: boolean;
   loading: boolean;
-  characters?: Character[];
+  characters?: DeepReadonly<Character[]>;
 }
 
 interface JoinData {

@@ -1,212 +1,26 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-    <!-- Backdrop -->
-    <div 
-      class="absolute inset-0 bg-black bg-opacity-50" 
-      @click="closeModal"
-    />
-    
-    <!-- Modal Content -->
-    <div class="relative bg-gray-800 rounded-lg border border-gray-700 p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-white">Character Details</h2>
-        <button 
-          class="text-gray-400 hover:text-white transition-colors"
-          @click="closeModal"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+  <Modal :is-open="isOpen" :title="character?.name || 'Character sheet'" wide @close="closeModal">
+    <p v-if="loading" class="muted py-8 text-center" role="status">Loading character…</p>
+    <div v-else-if="error" class="error-note" role="alert">{{ error }} <button class="text-link ml-3" @click="fetchCharacter">Try again</button></div>
+    <div v-else-if="character" class="space-y-7">
+      <div class="row-between"><p class="muted text-sm">Level {{ character.level }} · {{ character.race }} {{ character.class }}<span v-if="character.background"> · {{ character.background }}</span></p><span class="status" :class="{ 'status-inactive': !character.isActive }">{{ character.isActive ? 'Active' : 'Inactive' }}</span></div>
+      <section class="sheet-section"><h3>Ability scores</h3><div class="ability-grid"><div v-for="ability in abilityNames" :key="ability" class="ability-box"><span class="eyebrow">{{ ability.slice(0, 3) }}</span><strong>{{ getModifier(character[ability]) }}</strong><span class="muted text-xs">{{ character[ability] }}</span></div></div></section>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-7">
+        <section class="sheet-section"><h3>Health &amp; combat</h3><dl class="sheet-facts"><div><dt class="muted">Hit points</dt><dd>{{ character.currentHp }} / {{ character.maxHp }}</dd></div><div v-if="character.temporaryHp"><dt class="muted">Temporary HP</dt><dd>{{ character.temporaryHp }}</dd></div><div><dt class="muted">Armor class</dt><dd>{{ character.armorClass }}</dd></div><div><dt class="muted">Initiative</dt><dd>{{ character.initiative >= 0 ? '+' : '' }}{{ character.initiative }}</dd></div><div><dt class="muted">Speed</dt><dd>{{ character.speed }} ft</dd></div><div><dt class="muted">Hit dice</dt><dd>{{ character.hitDice }}</dd></div></dl></section>
+        <section class="sheet-section"><h3>Identity</h3><dl class="sheet-facts"><div><dt class="muted">Class</dt><dd>{{ character.class }}</dd></div><div><dt class="muted">Race</dt><dd>{{ character.race }}</dd></div><div><dt class="muted">Level</dt><dd>{{ character.level }}</dd></div><div v-if="character.background"><dt class="muted">Background</dt><dd>{{ character.background }}</dd></div><div v-if="character.alignment"><dt class="muted">Alignment</dt><dd>{{ character.alignment }}</dd></div></dl></section>
       </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center py-8">
-        <div class="text-gray-400">Loading character details...</div>
+      <section v-if="character.features?.length" class="sheet-section"><h3>Features &amp; traits</h3><div v-for="feature in character.features" :key="feature.name" class="mb-4"><h4 class="text-sm font-semibold">{{ feature.name }}</h4><p class="muted text-sm leading-relaxed mt-1">{{ feature.description }}</p><p v-if="feature.source" class="form-hint">Source: {{ feature.source }}</p></div></section>
+      <div v-if="character.weapons?.length || character.armor?.length" class="grid grid-cols-1 sm:grid-cols-2 gap-7">
+        <section v-if="character.weapons?.length" class="sheet-section"><h3>Weapons</h3><div v-for="weapon in character.weapons" :key="weapon.name" class="mb-4"><h4 class="text-sm font-semibold">{{ weapon.name }}</h4><p class="form-hint">{{ weapon.damage }} {{ weapon.damageType }}<span v-if="weapon.properties?.length"> · {{ weapon.properties.join(', ') }}</span></p></div></section>
+        <section v-if="character.armor?.length" class="sheet-section"><h3>Armor</h3><div v-for="armor in character.armor" :key="armor.name" class="mb-4"><h4 class="text-sm font-semibold">{{ armor.name }}</h4><p class="form-hint">AC {{ armor.armorClass }} · {{ armor.type }}</p><p v-if="armor.stealthDisadvantage" class="form-hint">Stealth disadvantage</p></div></section>
       </div>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="text-center py-8">
-        <div class="text-red-400">{{ error }}</div>
-        <button 
-          class="mt-2 text-blue-400 hover:text-blue-300 transition-colors"
-          @click="fetchCharacter"
-        >
-          Try Again
-        </button>
-      </div>
-
-      <!-- Character Details -->
-      <div v-else-if="character" class="space-y-6">
-        <!-- Basic Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-red-400 mb-3">Basic Information</h3>
-            <div class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <span class="text-gray-400">Name:</span>
-                <span class="text-white">{{ character.name }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Class:</span>
-                <span class="text-white">{{ character.class }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Race:</span>
-                <span class="text-white">{{ character.race }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Level:</span>
-                <span class="text-white">{{ character.level }}</span>
-              </div>
-              <div v-if="character.background" class="flex justify-between">
-                <span class="text-gray-400">Background:</span>
-                <span class="text-white">{{ character.background }}</span>
-              </div>
-              <div v-if="character.alignment" class="flex justify-between">
-                <span class="text-gray-400">Alignment:</span>
-                <span class="text-white">{{ character.alignment }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Health & Combat -->
-          <div class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-red-400 mb-3">Health & Combat</h3>
-            <div class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <span class="text-gray-400">Hit Points:</span>
-                <span class="text-white">{{ character.currentHp }}/{{ character.maxHp }}</span>
-              </div>
-              <div v-if="character.temporaryHp" class="flex justify-between">
-                <span class="text-gray-400">Temp HP:</span>
-                <span class="text-blue-400">{{ character.temporaryHp }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Armor Class:</span>
-                <span class="text-white">{{ character.armorClass }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Initiative:</span>
-                <span class="text-white">+{{ character.initiative }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Speed:</span>
-                <span class="text-white">{{ character.speed }} ft</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Hit Dice:</span>
-                <span class="text-white">{{ character.hitDice }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ability Scores -->
-        <div class="bg-gray-700 rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-red-400 mb-3">Ability Scores</h3>
-          <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">STR</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.strength) }}</div>
-              <div class="text-xs text-gray-500">({{ character.strength }})</div>
-            </div>
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">DEX</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.dexterity) }}</div>
-              <div class="text-xs text-gray-500">({{ character.dexterity }})</div>
-            </div>
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">CON</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.constitution) }}</div>
-              <div class="text-xs text-gray-500">({{ character.constitution }})</div>
-            </div>
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">INT</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.intelligence) }}</div>
-              <div class="text-xs text-gray-500">({{ character.intelligence }})</div>
-            </div>
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">WIS</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.wisdom) }}</div>
-              <div class="text-xs text-gray-500">({{ character.wisdom }})</div>
-            </div>
-            <div class="text-center">
-              <div class="text-xs text-gray-400 uppercase tracking-wide">CHA</div>
-              <div class="text-lg font-bold text-white">{{ getModifier(character.charisma) }}</div>
-              <div class="text-xs text-gray-500">({{ character.charisma }})</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Features -->
-        <div v-if="character.features?.length" class="bg-gray-700 rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-red-400 mb-3">Features & Traits</h3>
-          <div class="space-y-3">
-            <div v-for="feature in character.features" :key="feature.name" class="border-b border-gray-600 last:border-b-0 pb-2 last:pb-0">
-              <div class="font-medium text-white">{{ feature.name }}</div>
-              <div class="text-sm text-gray-300 mt-1">{{ feature.description }}</div>
-              <div v-if="feature.source" class="text-xs text-gray-500 mt-1">Source: {{ feature.source }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Equipment -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Weapons -->
-          <div v-if="character.weapons?.length" class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-red-400 mb-3">Weapons</h3>
-            <div class="space-y-2">
-              <div v-for="weapon in character.weapons" :key="weapon.name" class="text-sm">
-                <div class="font-medium text-white">{{ weapon.name }}</div>
-                <div class="text-gray-400">{{ weapon.damage }} {{ weapon.damageType }}</div>
-                <div v-if="weapon.properties?.length" class="text-xs text-gray-500">{{ weapon.properties.join(', ') }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Armor -->
-          <div v-if="character.armor?.length" class="bg-gray-700 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-red-400 mb-3">Armor</h3>
-            <div class="space-y-2">
-              <div v-for="armor in character.armor" :key="armor.name" class="text-sm">
-                <div class="font-medium text-white">{{ armor.name }}</div>
-                <div class="text-gray-400">AC: {{ armor.armorClass }} ({{ armor.type }})</div>
-                <div v-if="armor.stealthDisadvantage" class="text-xs text-yellow-500">Stealth Disadvantage</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Personality -->
-        <div v-if="hasPersonality" class="bg-gray-700 rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-red-400 mb-3">Personality</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div v-if="character.personalityTraits">
-              <div class="font-medium text-gray-300 mb-1">Personality Traits</div>
-              <div class="text-gray-400">{{ character.personalityTraits }}</div>
-            </div>
-            <div v-if="character.ideals">
-              <div class="font-medium text-gray-300 mb-1">Ideals</div>
-              <div class="text-gray-400">{{ character.ideals }}</div>
-            </div>
-            <div v-if="character.bonds">
-              <div class="font-medium text-gray-300 mb-1">Bonds</div>
-              <div class="text-gray-400">{{ character.bonds }}</div>
-            </div>
-            <div v-if="character.flaws">
-              <div class="font-medium text-gray-300 mb-1">Flaws</div>
-              <div class="text-gray-400">{{ character.flaws }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <section v-if="hasPersonality" class="sheet-section"><h3>Personality</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div v-for="(label, key) in { personalityTraits: 'Personality traits', ideals: 'Ideals', bonds: 'Bonds', flaws: 'Flaws' }" :key="key"><template v-if="character[key]"><h4 class="eyebrow mb-2">{{ label }}</h4><p class="muted text-sm leading-relaxed">{{ character[key] }}</p></template></div></div></section>
     </div>
-  </div>
+  </Modal>
 </template>
 
 <script setup lang="ts">
+import Modal from '~/components/ui/Modal.vue';
 import type { Character } from '~/server/db/types';
 
 interface Props {
@@ -218,6 +32,8 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   close: [];
 }>();
+
+const abilityNames = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const;
 
 const character = ref<Character | null>(null);
 const loading = ref(false);

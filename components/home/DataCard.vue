@@ -1,42 +1,18 @@
 <template>
-  <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
-    <h3 class="text-xl font-bold text-red-500 mb-4">{{ title }}</h3>
-    <div v-if="loading" class="text-gray-400 text-center py-4">
-      Loading {{ itemType }}s...
-    </div>
-    <div v-else-if="error" class="text-red-400 text-center py-4">
-      {{ error }}
-    </div>
-    <div v-else-if="items?.length" class="space-y-4">
-      <div v-for="item in items" :key="item.slug" class="border-b border-gray-700 last:border-0 pb-4 last:pb-0">
-        <h4 class="font-semibold text-gray-100">{{ item.name }}</h4>
-        <!-- Spell details -->
-        <template v-if="itemType === 'spell'">
-          <p class="text-sm text-gray-400">Level {{ (item as Spell).level }} {{ (item as Spell).school }}</p>
-        </template>
-        <!-- Magic item details -->
-        <template v-else-if="itemType === 'item'">
-          <p class="text-sm text-gray-400">{{ (item as MagicItem).type }} ({{ (item as MagicItem).rarity }})</p>
-        </template>
-        <!-- Weapon details -->
-        <template v-else-if="itemType === 'weapon'">
-          <p class="text-sm text-gray-400">
-            {{ (item as Weapon).category }} • {{ (item as Weapon).damage_dice }} {{ (item as Weapon).damage_type }}
-          </p>
-        </template>
-        <p class="text-sm text-gray-300 mt-1">
-          {{ item.desc?.slice(0, 100) || 'No description available' }}{{ item.desc?.length > 100 ? '...' : '' }}
-        </p>
-      </div>
-    </div>
-    <div v-else class="text-gray-400 text-center py-4">
-      No {{ itemType }}s found
-    </div>
+  <div class="inventory-grid" :aria-label="title">
+    <template v-if="loading"><span class="sr-only" role="status">Loading rules</span><div v-for="slot in 5" :key="slot" class="inventory-item inventory-skeleton" aria-hidden="true"><div class="skeleton-block h-11 w-11" /><div class="skeleton-block h-3 w-full mt-3" /><div class="skeleton-block h-3 w-2/3 mt-2" /></div></template>
+    <p v-else-if="error" class="error-note" role="alert">{{ error }}</p>
+    <template v-else-if="items?.length"><details v-for="item in items" :key="item.slug" class="inventory-item">
+      <summary><span class="inventory-icon" :class="`inventory-icon-${itemType}`"><GameIcon :name="itemType === 'spell' ? 'flame' : itemType === 'item' ? 'shield' : 'sword'" /></span><span class="inventory-name">{{ item.name }}</span><span class="inventory-meta">{{ itemType === 'spell' ? `Level ${(item as Spell).level} · ${(item as Spell).school}` : itemType === 'item' ? (item as MagicItem).rarity : `${(item as Weapon).damageDice} ${(item as Weapon).damageType}` }}</span><span class="inventory-expand">Details +</span></summary>
+      <p class="inventory-description">{{ item.description ? excerpt(item.description) : (item as Weapon).category }}</p>
+    </details></template>
+    <p v-else class="muted text-sm p-6">No entries in this category yet.</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Spell, MagicItem, Weapon } from '~/server/utils/open5e/types';
+import GameIcon from '~/components/ui/GameIcon.vue';
+import type { Spell, MagicItem, Weapon } from '~/server/services/open5e.service';
 
 interface Props {
   title: string;
@@ -47,4 +23,9 @@ interface Props {
 }
 
 defineProps<Props>();
+
+function excerpt(text: string) {
+  const plain = text.replace(/[#*_`]/g, '').replace(/\s+/g, ' ').trim();
+  return plain.length > 125 ? `${plain.slice(0, 122)}…` : plain;
+}
 </script> 

@@ -9,6 +9,7 @@ interface User {
 
 interface AuthState {
     user: User | null
+    sessionChecked: boolean
     loading: boolean
     error: string | null
 }
@@ -20,6 +21,7 @@ const authClient = createAuthClient({
 export const useAuthStore = defineStore('auth', {
     state: (): AuthState => ({
         user: null,
+        sessionChecked: false,
         loading: false,
         error: null
     }),
@@ -29,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     getters: {
-        isAuthenticated: state => !!state.user,
+        isAuthenticated: state => state.sessionChecked && !!state.user,
         isLoading: state => state.loading
     },
 
@@ -50,6 +52,7 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 if (data?.user) {
+                    this.sessionChecked = true
                     this.user = {
                         id: data.user.id,
                         name: data.user.name,
@@ -82,6 +85,7 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 if (data?.user) {
+                    this.sessionChecked = true
                     this.user = {
                         id: data.user.id,
                         name: data.user.name,
@@ -141,12 +145,13 @@ export const useAuthStore = defineStore('auth', {
                 this.error = errorMessage
                 this.user = null
             } finally {
+                this.sessionChecked = true
                 this.loading = false
             }
         },
 
         async initAuth() {
-            await this.fetchCurrentUser()
+            if (!this.sessionChecked) await this.fetchCurrentUser()
         }
     }
-}) 
+})
